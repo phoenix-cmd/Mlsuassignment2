@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fun English Learning</title>
+
+<style>
+/* 🌈 GLOBAL STYLE */
+body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Poppins", sans-serif;
+    background: linear-gradient(to bottom, #87CEEB, #FFFACD);
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ✨ ANIMATIONS */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes bounce {
+    0% { transform: scale(0.9); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* 🧒 WELCOME SCREEN */
+#welcomeScreen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeIn 1s;
+}
+
+#welcomeScreen h1 {
+    font-size: 40px;
+    color: #ff5722;
+}
+
+input {
+    padding: 15px;
+    font-size: 22px;
+    border-radius: 15px;
+    border: 2px solid #4CAF50;
+    width: 250px;
+    margin: 15px auto;
+}
+
+button {
+    padding: 15px 25px;
+    font-size: 22px;
+    border: none;
+    border-radius: 20px;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+    animation: bounce 1s;
+}
+
+button:hover {
+    background: #43a047;
+}
+
+/* 🏠 MAIN APP */
+#app {
+    padding: 20px;
+    animation: fadeIn 1s;
+}
+
+#welcomeText {
+    font-size: 30px;
+    color: #2E7D32;
+}
+
+/* 📘 CHAPTERS */
+.chapter {
+    background: white;
+    margin: 15px auto;
+    padding: 20px;
+    border-radius: 20px;
+    max-width: 400px;
+    font-size: 24px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+}
+
+.chapter.locked {
+    background: #ccc;
+    color: #666;
+}
+
+.chapter button {
+    margin-top: 10px;
+}
+
+/* 📚 LESSON SCREEN */
+#lesson h2 {
+    font-size: 32px;
+    color: #1565C0;
+}
+
+.word {
+    font-size: 36px;
+    margin: 10px;
+    display: inline-block;
+    padding: 10px 20px;
+    background: #ffeb3b;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.word.clicked {
+    background: #8BC34A;
+    color: white;
+}
+
+/* ✅ NEXT BUTTON */
+#nextBtn {
+    margin-top: 20px;
+    background: #ff9800;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🧒 WELCOME SCREEN -->
+<div id="welcomeScreen">
+    <h1>🌟 Welcome to Fun English Learning 🌟</h1>
+    <p style="font-size:24px;">What is your name?</p>
+    <input type="text" id="studentName" placeholder="Enter your name">
+    <button onclick="startApp()">Start Learning 🎉</button>
+</div>
+
+<!-- 🏠 MAIN APP -->
+<div id="app" class="hidden">
+    <h2 id="welcomeText"></h2>
+
+    <!-- 📘 CHAPTER LIST -->
+    <div id="chapters"></div>
+
+    <!-- 📚 LESSON -->
+    <div id="lesson" class="hidden">
+        <h2 id="lessonTitle"></h2>
+        <p style="font-size:22px;">Click all the words to complete 🎯</p>
+        <div id="lessonContent"></div>
+        <button id="nextBtn" class="hidden" onclick="completeChapter()">Next ➡️</button>
+    </div>
+</div>
+
+<script>
+/* 📦 DATA */
+const chapters = [
+    { title: "Alphabet & Phonics", words: ["A", "B", "C"] },
+    { title: "Simple Words", words: ["Cat", "Ball", "Sun"] },
+    { title: "Simple Sentences", words: ["I am happy"] },
+    { title: "Daily Use Words", words: ["Please", "Sorry", "Thank You"] },
+    { title: "Basic Grammar", words: ["Noun", "Verb"] }
+];
+
+let currentChapter = 0;
+let clickedWords = new Set();
+
+/* 🚀 START APP */
+function startApp() {
+    const name = document.getElementById("studentName").value.trim();
+    if (!name) {
+        alert("Please enter your name 😊");
+        return;
+    }
+    localStorage.setItem("studentName", name);
+    document.getElementById("welcomeScreen").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    init();
+}
+
+/* 🔄 INIT */
+function init() {
+    const name = localStorage.getItem("studentName");
+    document.getElementById("welcomeText").innerText = `Welcome, ${name}! 🎈`;
+
+    currentChapter = parseInt(localStorage.getItem("progress")) || 0;
+    renderChapters();
+}
+
+/* 📘 SHOW CHAPTERS */
+function renderChapters() {
+    const container = document.getElementById("chapters");
+    container.innerHTML = "";
+
+    chapters.forEach((chap, index) => {
+        const div = document.createElement("div");
+        div.className = "chapter";
+
+        if (index > currentChapter) {
+            div.classList.add("locked");
+            div.innerHTML = `${chap.title} 🔒`;
+        } else {
+            div.innerHTML = `${chap.title}<br><button onclick="openChapter(${index})">Start</button>`;
+        }
+        container.appendChild(div);
+    });
+}
+
+/* 📚 OPEN CHAPTER */
+function openChapter(index) {
+    clickedWords.clear();
+    document.getElementById("lesson").classList.remove("hidden");
+    document.getElementById("lessonTitle").innerText = chapters[index].title;
+    document.getElementById("lessonContent").innerHTML = "";
+    document.getElementById("nextBtn").classList.add("hidden");
+
+    chapters[index].words.forEach(word => {
+        const span = document.createElement("span");
+        span.className = "word";
+        span.innerText = word;
+        span.onclick = () => clickWord(span, word);
+        document.getElementById("lessonContent").appendChild(span);
+    });
+}
+
+/* 🎯 WORD CLICK */
+function clickWord(el, word) {
+    if (!clickedWords.has(word)) {
+        clickedWords.add(word);
+        el.classList.add("clicked");
+    }
+
+    if (clickedWords.size === chapters[currentChapter].words.length) {
+        document.getElementById("nextBtn").classList.remove("hidden");
+    }
+}
+
+/* ✅ COMPLETE CHAPTER */
+function completeChapter() {
+    currentChapter++;
+    localStorage.setItem("progress", currentChapter);
+    document.getElementById("lesson").classList.add("hidden");
+    renderChapters();
+}
+</script>
+
+</body>
+</html>
