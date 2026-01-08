@@ -15,6 +15,7 @@
             --bg: #F7F9FC;
             --locked: #95a5a6;
             --success: #2ecc71;
+            --danger: #e74c3c;
         }
 
         * { box-sizing: border-box; user-select: none; }
@@ -55,6 +56,11 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 5px solid rgba(0,0,0,0.1);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
         }
 
         .profile-badge {
@@ -272,6 +278,25 @@
             font-family: inherit;
         }
 
+        /* Reset Button Style */
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #ffcccc;
+            color: #ffcccc;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
         /* --- Animations --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
@@ -288,7 +313,11 @@
 
     <div class="app-container">
         <header id="main-header" style="display:none;">
-            <button class="btn-back" onclick="goHome()">🏡 Home</button>
+            <div class="header-buttons">
+                <button class="btn-back" onclick="goHome()">🏡 Home</button>
+                <button class="btn-reset" onclick="resetProgress()">🔄 Reset</button>
+            </div>
+            
             <div class="profile-badge">
                 <span id="display-name">Student</span>
                 <div class="score-display">⭐ <span id="display-score">0</span></div>
@@ -464,6 +493,30 @@
             showDashboard();
         }
 
+        // --- RESET FEATURE (NEW) ---
+        function resetProgress() {
+            let confirmReset = confirm("Are you sure you want to restart? All progress will be lost! 😲");
+            
+            if (confirmReset) {
+                // Clear browser memory
+                localStorage.removeItem('englishQuestUser');
+                
+                // Reset JS state
+                userState = {
+                    name: "",
+                    score: 0,
+                    unlockedLevel: 1
+                };
+
+                // Clear visual elements
+                document.getElementById('main-header').style.display = 'none';
+                document.getElementById('username-input').value = "";
+
+                // Return to start
+                switchScreen('screen-welcome');
+            }
+        }
+
         function updateHeader() {
             document.getElementById('display-name').textContent = userState.name;
             document.getElementById('display-score').textContent = userState.score;
@@ -525,7 +578,6 @@
             const optionsDiv = document.getElementById('quiz-options');
             optionsDiv.innerHTML = "";
             
-            // Randomize options slightly or keep fixed? Keeping fixed for simplicity for kids
             chapter.quiz.options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
@@ -541,7 +593,7 @@
 
             if (selected === correct) {
                 btnElement.classList.add('correct');
-                feedback.innerText = " Great Job! That is correct!";
+                feedback.innerText = "🌟 Great Job! That is correct!";
                 feedback.style.color = "var(--success)";
                 
                 // Disable all buttons
@@ -570,7 +622,7 @@
             if (userState.unlockedLevel === currentActiveChapter.id) {
                 userState.unlockedLevel++;
                 saveProgress();
-                alert(` Fantastic! You unlocked Chapter ${userState.unlockedLevel}!`);
+                alert(`Fantastic! You unlocked Chapter ${userState.unlockedLevel}!`);
             }
             showDashboard();
         }
