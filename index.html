@@ -3,516 +3,577 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Buddy - Fun Learning!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <title>English Quest - Kids Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #FFD93D; /* Yellow */
-            --secondary: #6BCB77; /* Green */
-            --accent: #4D96FF; /* Blue */
-            --danger: #FF6B6B; /* Red/Pink */
-            --dark: #444;
-            --light: #fff;
-            --shadow: 0 8px 0 rgba(0,0,0,0.15);
+            --primary: #FF6B6B; /* Soft Red */
+            --secondary: #4ECDC4; /* Teal */
+            --accent: #FFE66D; /* Yellow */
+            --text: #2C3E50;
+            --bg: #F7F9FC;
+            --locked: #95a5a6;
+            --success: #2ecc71;
         }
 
-        * {
-            box-sizing: border-box;
-            user-select: none;
-        }
+        * { box-sizing: border-box; user-select: none; }
 
         body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%);
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#e0e0e0 10%, transparent 11%), radial-gradient(#e0e0e0 10%, transparent 11%);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
             margin: 0;
+            padding: 0;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
             min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
             display: flex;
             flex-direction: column;
+        }
+
+        /* --- Header & Profile --- */
+        header {
+            background: var(--secondary);
+            padding: 15px 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            overflow-x: hidden;
+            border-bottom: 5px solid rgba(0,0,0,0.1);
         }
 
-        h1, h2, h3 {
-            font-family: 'Fredoka One', cursive;
-            color: var(--accent);
-            text-align: center;
-            margin-bottom: 0.5rem;
+        .profile-badge {
+            background: white;
+            color: var(--secondary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* --- Animations --- */
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(20px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .score-display {
+            background: var(--accent);
+            color: var(--text);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.9em;
         }
 
         /* --- Screens --- */
         .screen {
-            width: 100%;
-            max-width: 800px;
-            padding: 20px;
             display: none; /* Hidden by default */
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .active {
-            display: flex;
+            padding: 30px;
+            flex: 1;
             flex-direction: column;
             align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: flex;
         }
 
         /* --- Welcome Screen --- */
-        #welcome-screen img {
+        .welcome-content img {
             width: 150px;
             margin-bottom: 20px;
             animation: bounce 2s infinite;
         }
 
-        input {
+        input[type="text"] {
             padding: 15px;
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
             font-size: 1.2rem;
-            border: 3px solid var(--accent);
-            border-radius: 50px;
             width: 80%;
             max-width: 300px;
+            font-family: inherit;
+            margin: 20px 0;
             text-align: center;
             outline: none;
-            margin: 20px 0;
-            font-family: 'Fredoka One', cursive;
-            color: var(--dark);
         }
 
-        input:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 15px rgba(107, 203, 119, 0.5);
+        input[type="text"]:focus {
+            border-color: var(--primary);
         }
 
-        /* --- Dashboard --- */
-        .header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-
-        .student-badge {
-            font-weight: bold;
-            color: var(--accent);
-            font-size: 1.2rem;
-        }
-
-        .grid-container {
+        /* --- Dashboard (Chapters) --- */
+        .chapter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             width: 100%;
+            margin-top: 20px;
         }
 
         .chapter-card {
             background: white;
-            padding: 20px;
+            border: 3px solid var(--secondary);
             border-radius: 20px;
-            text-align: center;
+            padding: 20px;
             cursor: pointer;
-            transition: transform 0.2s;
-            border-bottom: 6px solid #eee;
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
+            overflow: hidden;
         }
 
-        .chapter-card:hover {
+        .chapter-card:not(.locked):hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 0 var(--secondary);
         }
 
         .chapter-card.locked {
-            filter: grayscale(1);
-            opacity: 0.7;
+            border-color: var(--locked);
+            background: #f0f0f0;
             cursor: not-allowed;
-            pointer-events: none;
+            opacity: 0.7;
         }
 
         .chapter-icon {
             font-size: 3rem;
             margin-bottom: 10px;
+            display: block;
         }
 
-        .lock-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5rem;
+        .lock-overlay {
+            display: none;
         }
-
-        /* --- Chapter Content --- */
-        .game-area {
-            background: white;
-            padding: 30px;
-            border-radius: 25px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border: 4px solid var(--primary);
-        }
-
-        .question-text {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            color: var(--dark);
-        }
-
-        .options-grid {
+        
+        .chapter-card.locked .lock-overlay {
             display: flex;
-            gap: 15px;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.1);
             justify-content: center;
-            flex-wrap: wrap;
+            align-items: center;
+            font-size: 3rem;
+        }
+
+        /* --- Chapter Learning Area --- */
+        .learning-section {
+            width: 100%;
+            text-align: left;
+        }
+
+        .lesson-card {
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .lesson-img {
+            font-size: 2.5rem;
+            background: #f0f8ff;
+            padding: 10px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Quiz Section --- */
+        .quiz-container {
+            margin-top: 30px;
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            border: 3px dashed var(--accent);
         }
 
         .option-btn {
-            background: var(--light);
-            border: 3px solid var(--accent);
-            color: var(--accent);
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: inherit;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 4px 0 var(--accent);
         }
 
-        .option-btn:active {
-            transform: translateY(4px);
-            box-shadow: none;
+        .option-btn:hover {
+            background: var(--secondary);
+            color: white;
         }
 
         .option-btn.correct {
-            background: var(--secondary);
-            border-color: var(--secondary);
+            background: var(--success);
             color: white;
-            box-shadow: 0 4px 0 #4da858;
+            border-color: var(--success);
         }
-
+        
         .option-btn.wrong {
-            background: var(--danger);
-            border-color: var(--danger);
+            background: var(--primary);
             color: white;
-            box-shadow: 0 4px 0 #d64545;
+            border-color: var(--primary);
             animation: shake 0.5s;
         }
 
-        @keyframes shake {
-            0%, 100% {transform: translateX(0);}
-            25% {transform: translateX(-5px);}
-            75% {transform: translateX(5px);}
-        }
-
         /* --- Buttons --- */
-        .btn-main {
+        .btn-primary {
             background: var(--primary);
-            color: var(--dark);
+            color: white;
             border: none;
             padding: 15px 40px;
             font-size: 1.2rem;
             border-radius: 50px;
-            font-family: 'Fredoka One', cursive;
             cursor: pointer;
-            box-shadow: var(--shadow);
-            transition: all 0.2s;
-            margin-top: 20px;
+            font-family: inherit;
+            font-weight: 700;
+            box-shadow: 0 5px 0 #c0392b;
+            transition: transform 0.1s;
         }
 
-        .btn-main:hover {
-            transform: scale(1.05);
-            background: #ffe066;
+        .btn-primary:active {
+            transform: translateY(5px);
+            box-shadow: none;
         }
 
         .btn-back {
-            background: #eee;
-            padding: 10px 20px;
-            border-radius: 20px;
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
             cursor: pointer;
-            font-weight: bold;
-            border: none;
+            font-family: inherit;
         }
 
-        /* --- Completion Message --- */
-        .success-msg {
-            color: var(--secondary);
-            font-size: 1.5rem;
-            margin-top: 20px;
-            display: none;
-            animation: pulse 1s infinite;
-        }
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
 
+        /* --- Responsive --- */
+        @media (max-width: 600px) {
+            .app-container { margin: 0; border-radius: 0; min-height: 100vh; }
+            .chapter-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="welcome-screen" class="screen active">
-        <h1>English Buddy</h1>
-        <div style="font-size: 4rem;">🦁</div>
-        <p style="font-size: 1.2rem; color: #666;">Learn English the fun way!</p>
-        
-        <h3>What is your name?</h3>
-        <input type="text" id="studentNameInput" placeholder="Enter your name...">
-        <button class="btn-main" onclick="startApp()">Let's Go! 🚀</button>
-    </div>
+    <div class="app-container">
+        <header id="main-header" style="display:none;">
+            <button class="btn-back" onclick="goHome()">🏡 Home</button>
+            <div class="profile-badge">
+                <span id="display-name">Student</span>
+                <div class="score-display">⭐ <span id="display-score">0</span></div>
+            </div>
+        </header>
 
-    <div id="dashboard-screen" class="screen">
-        <div class="header">
-            <span class="student-badge">👋 Hi, <span id="display-name">Student</span>!</span>
-            <button class="btn-back" onclick="resetProgress()" style="font-size: 0.8rem;">Reset Progress</button>
+        <div id="screen-welcome" class="screen active">
+            <div class="welcome-content">
+                <div style="font-size: 80px;">🎒</div>
+                <h1>Hello, Friend!</h1>
+                <p>What is your name?</p>
+                <input type="text" id="username-input" placeholder="Type name here..." maxlength="15">
+                <br>
+                <button class="btn-primary" onclick="startGame()">Let's Start!</button>
+            </div>
         </div>
 
-        <h2>Your Adventure Map</h2>
-        <p style="margin-bottom: 20px; color: #666;">Complete a chapter to unlock the next one!</p>
-
-        <div class="grid-container" id="chapter-grid">
-            </div>
-    </div>
-
-    <div id="game-screen" class="screen">
-        <div class="header">
-            <button class="btn-back" onclick="showDashboard()">⬅ Back</button>
-            <h3 id="game-title" style="margin:0;">Chapter Title</h3>
+        <div id="screen-dashboard" class="screen">
+            <h2>Your Learning Map 🗺️</h2>
+            <p>Complete a chapter to unlock the next one!</p>
+            <div class="chapter-grid" id="chapter-list">
+                </div>
         </div>
 
-        <div class="game-area">
-            <div id="quiz-container">
-                <div style="font-size: 3rem; margin-bottom: 10px;" id="q-emoji">❓</div>
-                <div class="question-text" id="q-text">Question goes here...</div>
-                <div class="options-grid" id="options-area">
-                    </div>
-            </div>
+        <div id="screen-chapter" class="screen">
+            <h2 id="chapter-title" style="color: var(--primary);">Chapter Title</h2>
             
-            <div class="success-msg" id="success-msg">
-                🎉 Great Job! Chapter Complete!
+            <div id="learning-content" class="learning-section">
+                </div>
+
+            <div class="quiz-container">
+                <h3>🎮 Mini Quiz</h3>
+                <p id="quiz-question">Question goes here?</p>
+                <div id="quiz-options">
+                    </div>
+                <p id="quiz-feedback" style="font-weight: bold; min-height: 20px;"></p>
             </div>
 
-            <button class="btn-main" id="next-chapter-btn" style="display:none;" onclick="completeChapter()">Next Chapter 🔓</button>
+            <br>
+            <button id="btn-next-chapter" class="btn-primary" style="display:none;" onclick="finishChapter()">Complete Chapter! 🏆</button>
         </div>
     </div>
 
     <script>
-        // --- Data Structure ---
-        const chapters = [
+        // --- DATA: Curriculum Content ---
+        const curriculum = [
             {
                 id: 1,
-                title: "Alphabet Fun",
+                title: "Alphabet & Phonics",
                 icon: "🅰️",
-                color: "#FFD93D",
-                questions: [
-                    { q: "Which letter starts the word 'Apple'?", emoji: "🍎", options: ["A", "B", "C"], ans: "A" },
-                    { q: "Which letter starts the word 'Ball'?", emoji: "⚽", options: ["Z", "M", "B"], ans: "B" },
-                    { q: "Select the letter 'S' for Sun", emoji: "☀️", options: ["S", "C", "O"], ans: "S" }
-                ]
+                lessons: [
+                    { emoji: "🍎", text: "A is for Apple. (Ah-Ah-Apple)" },
+                    { emoji: "🦇", text: "B is for Bat. (Buh-Buh-Bat)" },
+                    { emoji: "🐱", text: "C is for Cat. (Kuh-Kuh-Cat)" },
+                    { emoji: "🐶", text: "D is for Dog. (Duh-Duh-Dog)" }
+                ],
+                quiz: {
+                    q: "Which word starts with the letter 'B'?",
+                    options: ["Apple", "Bat", "Cat"],
+                    answer: "Bat"
+                }
             },
             {
                 id: 2,
                 title: "Simple Words",
-                icon: "🐱",
-                color: "#6BCB77",
-                questions: [
-                    { q: "What is this?", emoji: "🐱", options: ["Dog", "Cat", "Fish"], ans: "Cat" },
-                    { q: "What is this?", emoji: "🚗", options: ["Car", "Bus", "Bike"], ans: "Car" },
-                    { q: "Choose the word for the picture.", emoji: "🌳", options: ["Flower", "Tree", "Grass"], ans: "Tree" }
-                ]
+                icon: "📖",
+                lessons: [
+                    { emoji: "☀️", text: "Sun - It is hot and yellow." },
+                    { emoji: "🌙", text: "Moon - We see it at night." },
+                    { emoji: "🌳", text: "Tree - It has green leaves." },
+                    { emoji: "🚗", text: "Car - We drive in a car." }
+                ],
+                quiz: {
+                    q: "What do we see at night?",
+                    options: ["Sun", "Car", "Moon"],
+                    answer: "Moon"
+                }
             },
             {
                 id: 3,
-                title: "Colors & Shapes",
-                icon: "🎨",
-                color: "#4D96FF",
-                questions: [
-                    { q: "What color is the sky?", emoji: "☁️", options: ["Blue", "Red", "Green"], ans: "Blue" },
-                    { q: "What shape is a pizza slice?", emoji: "🍕", options: ["Circle", "Triangle", "Square"], ans: "Triangle" },
-                    { q: "What color is a banana?", emoji: "🍌", options: ["Yellow", "Purple", "Pink"], ans: "Yellow" }
-                ]
+                title: "Simple Sentences",
+                icon: "🗣️",
+                lessons: [
+                    { emoji: "👋", text: "Hello! My name is..." },
+                    { emoji: "😊", text: "I am happy today." },
+                    { emoji: "🏫", text: "I go to school." },
+                    { emoji: "⚽", text: "I like to play football." }
+                ],
+                quiz: {
+                    q: "Complete: 'I ___ happy today.'",
+                    options: ["is", "am", "are"],
+                    answer: "am"
+                }
             },
             {
                 id: 4,
-                title: "Daily Words",
+                title: "Daily Use Words",
                 icon: "🏠",
-                color: "#FF6B6B",
-                questions: [
-                    { q: "Where do we sleep?", emoji: "🛌", options: ["Kitchen", "Bed", "Park"], ans: "Bed" },
-                    { q: "What do we use to drink water?", emoji: "🥤", options: ["Glass", "Fork", "Plate"], ans: "Glass" },
-                    { q: "What do we wear on our feet?", emoji: "👟", options: ["Hat", "Shoes", "Gloves"], ans: "Shoes" }
-                ]
+                lessons: [
+                    { emoji: "🥛", text: "Milk - I drink milk." },
+                    { emoji: "📚", text: "Book - I read a book." },
+                    { emoji: "🪑", text: "Chair - I sit on a chair." },
+                    { emoji: "🥄", text: "Spoon - I eat with a spoon." }
+                ],
+                quiz: {
+                    q: "What do you use to sit?",
+                    options: ["Spoon", "Book", "Chair"],
+                    answer: "Chair"
+                }
             },
             {
                 id: 5,
-                title: "Grammar Time",
-                icon: "📚",
-                color: "#A06CD5",
-                questions: [
-                    { q: "Is 'Run' a Verb (Action) or Noun (Thing)?", emoji: "🏃", options: ["Verb", "Noun"], ans: "Verb" },
-                    { q: "Is 'Book' a Verb or Noun?", emoji: "📖", options: ["Verb", "Noun"], ans: "Noun" },
-                    { q: "Complete: I ___ happy.", emoji: "😊", options: ["is", "am", "are"], ans: "am" }
-                ]
+                title: "Basic Grammar",
+                icon: "🧩",
+                lessons: [
+                    { emoji: "🏃", text: "Verb (Action): Run, Jump, Sleep." },
+                    { emoji: "🎈", text: "Noun (Thing): Ball, Kite, Pen." },
+                    { emoji: "👦", text: "Noun (Person): Boy, Girl, Teacher." },
+                    { emoji: "🐦", text: "Noun (Animal): Bird, Fish." }
+                ],
+                quiz: {
+                    q: "Which one is an Action (Verb)?",
+                    options: ["Ball", "Jump", "Boy"],
+                    answer: "Jump"
+                }
             }
         ];
 
-        // --- State Management ---
-        let currentUser = localStorage.getItem('eb_name') || "";
-        let progress = parseInt(localStorage.getItem('eb_progress')) || 1; // 1 means Chapter 1 is unlocked
-        let currentChapterId = 0;
-        let currentQuestionIndex = 0;
+        // --- STATE MANAGEMENT ---
+        let userState = {
+            name: "",
+            score: 0,
+            unlockedLevel: 1 // Starts at level 1
+        };
 
-        // --- Initialization ---
+        let currentActiveChapter = null;
+
+        // --- INITIALIZATION ---
         window.onload = function() {
-            if (currentUser) {
-                document.getElementById('display-name').textContent = currentUser;
-                switchScreen('dashboard-screen');
-                renderDashboard();
+            const savedData = localStorage.getItem('englishQuestUser');
+            if (savedData) {
+                userState = JSON.parse(savedData);
+                showDashboard();
             } else {
-                switchScreen('welcome-screen');
+                switchScreen('screen-welcome');
             }
         };
 
-        // --- Core Functions ---
+        function saveProgress() {
+            localStorage.setItem('englishQuestUser', JSON.stringify(userState));
+            updateHeader();
+        }
 
+        // --- NAVIGATION ---
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
-        function startApp() {
-            const name = document.getElementById('studentNameInput').value.trim();
-            if (name === "") {
-                alert("Please enter your name!");
+        function startGame() {
+            const nameInput = document.getElementById('username-input');
+            const name = nameInput.value.trim();
+            if (name.length < 2) {
+                alert("Please enter a longer name!");
                 return;
             }
-            currentUser = name;
-            localStorage.setItem('eb_name', currentUser);
-            localStorage.setItem('eb_progress', progress); // Init progress if needed
-            
-            document.getElementById('display-name').textContent = currentUser;
-            switchScreen('dashboard-screen');
-            renderDashboard();
-        }
-
-        function renderDashboard() {
-            const grid = document.getElementById('chapter-grid');
-            grid.innerHTML = "";
-
-            chapters.forEach(chap => {
-                const isLocked = chap.id > progress;
-                const card = document.createElement('div');
-                card.className = `chapter-card ${isLocked ? 'locked' : ''}`;
-                card.onclick = () => !isLocked && loadChapter(chap.id);
-                
-                card.innerHTML = `
-                    ${isLocked ? '<div class="lock-icon">🔒</div>' : ''}
-                    <div class="chapter-icon">${chap.icon}</div>
-                    <h3>${chap.title}</h3>
-                    <p style="color:#888; font-size: 0.9rem;">${chap.questions.length} Challenges</p>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function showDashboard() {
-            switchScreen('dashboard-screen');
-            renderDashboard();
-        }
-
-        // --- Game Logic ---
-
-        function loadChapter(id) {
-            currentChapterId = id;
-            currentQuestionIndex = 0;
-            
-            const chapter = chapters.find(c => c.id === id);
-            document.getElementById('game-title').textContent = chapter.title;
-            document.getElementById('success-msg').style.display = 'none';
-            document.getElementById('next-chapter-btn').style.display = 'none';
-            document.getElementById('quiz-container').style.display = 'block';
-
-            switchScreen('game-screen');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            const chapter = chapters.find(c => c.id === currentChapterId);
-            const qData = chapter.questions[currentQuestionIndex];
-
-            document.getElementById('q-emoji').textContent = qData.emoji;
-            document.getElementById('q-text').textContent = `Question ${currentQuestionIndex + 1}/${chapter.questions.length}: ${qData.q}`;
-            
-            const optionsArea = document.getElementById('options-area');
-            optionsArea.innerHTML = "";
-
-            qData.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn";
-                btn.textContent = opt;
-                btn.onclick = () => checkAnswer(btn, opt, qData.ans);
-                optionsArea.appendChild(btn);
-            });
-        }
-
-        function checkAnswer(btn, selected, correct) {
-            if (selected === correct) {
-                btn.classList.add('correct');
-                // Disable all buttons
-                const allBtns = document.querySelectorAll('.option-btn');
-                allBtns.forEach(b => b.disabled = true);
-                
-                setTimeout(() => {
-                    nextQuestion();
-                }, 1000);
-            } else {
-                btn.classList.add('wrong');
-                setTimeout(() => btn.classList.remove('wrong'), 500);
-            }
-        }
-
-        function nextQuestion() {
-            const chapter = chapters.find(c => c.id === currentChapterId);
-            
-            if (currentQuestionIndex < chapter.questions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-            } else {
-                // Chapter Finished
-                document.getElementById('quiz-container').style.display = 'none';
-                document.getElementById('success-msg').style.display = 'block';
-                document.getElementById('next-chapter-btn').style.display = 'inline-block';
-            }
-        }
-
-        function completeChapter() {
-            if (currentChapterId === progress) {
-                progress++;
-                localStorage.setItem('eb_progress', progress);
-            }
+            userState.name = name;
+            saveProgress();
             showDashboard();
         }
 
-        function resetProgress() {
-            if(confirm("Are you sure you want to restart the game?")) {
-                localStorage.clear();
-                location.reload();
+        function goHome() {
+            showDashboard();
+        }
+
+        function updateHeader() {
+            document.getElementById('display-name').textContent = userState.name;
+            document.getElementById('display-score').textContent = userState.score;
+        }
+
+        // --- DASHBOARD LOGIC ---
+        function showDashboard() {
+            document.getElementById('main-header').style.display = 'flex';
+            updateHeader();
+            switchScreen('screen-dashboard');
+            renderChapters();
+        }
+
+        function renderChapters() {
+            const list = document.getElementById('chapter-list');
+            list.innerHTML = '';
+
+            curriculum.forEach((chapter) => {
+                const isLocked = chapter.id > userState.unlockedLevel;
+                const card = document.createElement('div');
+                card.className = `chapter-card ${isLocked ? 'locked' : ''}`;
+                card.onclick = () => !isLocked && openChapter(chapter);
+
+                card.innerHTML = `
+                    <span class="chapter-icon">${chapter.icon}</span>
+                    <h3>Chapter ${chapter.id}</h3>
+                    <p>${chapter.title}</p>
+                    ${isLocked ? '<div class="lock-overlay">🔒</div>' : ''}
+                    ${(!isLocked && chapter.id < userState.unlockedLevel) ? '<div style="color:var(--success); font-weight:bold;">Completed ✅</div>' : ''}
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // --- CHAPTER LOGIC ---
+        function openChapter(chapter) {
+            currentActiveChapter = chapter;
+            switchScreen('screen-chapter');
+            
+            document.getElementById('chapter-title').innerText = `${chapter.icon} ${chapter.title}`;
+            document.getElementById('btn-next-chapter').style.display = "none";
+            document.getElementById('quiz-feedback').innerText = "";
+            document.getElementById('quiz-feedback').style.color = "black";
+
+            // Render Lessons
+            const contentDiv = document.getElementById('learning-content');
+            contentDiv.innerHTML = "";
+            chapter.lessons.forEach(lesson => {
+                contentDiv.innerHTML += `
+                    <div class="lesson-card">
+                        <div class="lesson-img">${lesson.emoji}</div>
+                        <div>${lesson.text}</div>
+                    </div>
+                `;
+            });
+
+            // Setup Quiz
+            document.getElementById('quiz-question').innerText = chapter.quiz.q;
+            const optionsDiv = document.getElementById('quiz-options');
+            optionsDiv.innerHTML = "";
+            
+            // Randomize options slightly or keep fixed? Keeping fixed for simplicity for kids
+            chapter.quiz.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, chapter.quiz.answer, btn);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btnElement) {
+            const feedback = document.getElementById('quiz-feedback');
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            if (selected === correct) {
+                btnElement.classList.add('correct');
+                feedback.innerText = " Great Job! That is correct!";
+                feedback.style.color = "var(--success)";
+                
+                // Disable all buttons
+                allBtns.forEach(b => b.disabled = true);
+                
+                // Show completion button
+                document.getElementById('btn-next-chapter').style.display = "inline-block";
+                
+                // Add score if this is the first time completing this level
+                if (userState.unlockedLevel === currentActiveChapter.id) {
+                    userState.score += 10;
+                    saveProgress();
+                }
+            } else {
+                btnElement.classList.add('wrong');
+                feedback.innerText = "Oops! Try again.";
+                feedback.style.color = "var(--primary)";
+                setTimeout(() => {
+                    btnElement.classList.remove('wrong');
+                }, 1000);
             }
         }
 
+        function finishChapter() {
+            // Unlock next chapter if we are at the current max level
+            if (userState.unlockedLevel === currentActiveChapter.id) {
+                userState.unlockedLevel++;
+                saveProgress();
+                alert(` Fantastic! You unlocked Chapter ${userState.unlockedLevel}!`);
+            }
+            showDashboard();
+        }
     </script>
 </body>
 </html>
